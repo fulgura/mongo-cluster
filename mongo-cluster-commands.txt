@@ -1,0 +1,8 @@
+# 
+#
+#
+mongod --dbpath ./data/set11 --port 10001 --replSet set01 --journal --oplogSize 700 --rest
+mongod --dbpath ./data/set12 --port 10002 --replSet set01 --journal --oplogSize 700 --rest
+mongod --dbpath ./data/set13 --port 10003 --replSet set01 --journal --oplogSize 700 --rest
+
+
