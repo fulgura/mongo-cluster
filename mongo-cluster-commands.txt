@@ -1,8 +1,62 @@
 # 
 #
 #
-mongod --dbpath ./data/set11 --port 10001 --replSet set01 --journal --oplogSize 700 --rest
-mongod --dbpath ./data/set12 --port 10002 --replSet set01 --journal --oplogSize 700 --rest
-mongod --dbpath ./data/set13 --port 10003 --replSet set01 --journal --oplogSize 700 --rest
+mkdir -p data/set11
+mongod --dbpath data/set11 --port 10001 --replSet set01 --journal --oplogSize 700 --rest
+mkdir -p data/set12
+mongod --dbpath data/set12 --port 10002 --replSet set01 --journal --oplogSize 700 --rest
+mkdir -p data/set13
+mongod --dbpath data/set13 --port 10003 --replSet set01 --journal --oplogSize 700 --rest
+
+
+mongo localhost:10001/admin
+
+db.runCommand({"replSetInitiate" : {"_id" : "set01", "members" : [{"_id" : 1, "host" : "localhost:10001"}, {"_id" : 2, "host" : "localhost:10002"}, {"_id" : 3, "host" : "localhost:10003"}]}})
+
+
+mkdir -p data/config1
+mongod --configsvr --journal --dbpath data/config1 --port 20001
+mkdir -p data/config2
+mongod --configsvr --journal --dbpath data/config2 --port 20002
+mkdir -p data/config3
+mongod --configsvr --journal --dbpath data/config3 --port 20003
+
+
+mongos --configdb localhost:20001,localhost:20002,localhost:20003 --port 27017 --chunkSize 1
+
+
+
+mongo localhost:27017/admin
+db.runCommand( { addshard : "set01/localhost:10001,localhost:10002,localhost:10003" } )
+
+
+mkdir -p data/set21
+mongod --dbpath data/set21 --port 10004 --replSet set02 --journal --oplogSize 700 --rest
+mkdir -p data/set22
+mongod --dbpath data/set22 --port 10005 --replSet set02 --journal --oplogSize 700 --rest
+mkdir -p data/set23
+mongod --dbpath data/set23 --port 10006 --replSet set02 --journal --oplogSize 700 --rest
+
+mongo localhost:10004/admin
+
+db.runCommand({"replSetInitiate" : {"_id" : "set02", "members" : [{"_id" : 1, "host" : "localhost:10004"}, {"_id" : 2, "host" : "localhost:10005"}, {"_id" : 3, "host" : "localhost:10006"}]}})
+
+
+mongo localhost:27017/admin
+db.runCommand( { addshard : "set02/localhost:10004,localhost:10005,localhost:10006" } )
+db.runCommand({listshards:1})
+
+
+
+db.runCommand( { enablesharding : "test" } )
+use test
+db.test_collection.ensureIndex({number:1})
+
+use admin
+db.runCommand( { shardcollection : "test.test_collection", key : {"number":1} })
+
+
+
+
 
 
