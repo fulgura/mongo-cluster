@@ -60,7 +60,7 @@ mongo localhost:10007/admin
 db.runCommand({"replSetInitiate" : {"_id" : "set03", "members" : [{"_id" : 1, "host" : "localhost:10007"}, {"_id" : 2, "host" : "localhost:10008"}, {"_id" : 3, "host" : "localhost:10009"}]}})
 
 mongo localhost:27017/admin
-db.runCommand( { addshard : "set02/localhost:10007,localhost:10008,localhost:10009" } )
+db.runCommand( { addshard : "set03/localhost:10007,localhost:10008,localhost:10009" } )
 db.runCommand({listshards:1})
 
 
